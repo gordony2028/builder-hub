@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder Hub - Connect with fellow builders and makers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav-container">
+            <ul class="nav-tabs">
+                <li><a href="#starting-up" class="nav-tab" data-tab="starting-up">Starting Up</a></li>
+                <li><a href="#tech" class="nav-tab" data-tab="tech">Tech</a></li>
+                <li><a href="#ai" class="nav-tab" data-tab="ai">A.I.</a></li>
+                <li><a href="#builder-hub" class="nav-tab brand-tab active" data-tab="builder-hub">BUILDER HUB</a></li>
+                <li><a href="#creators" class="nav-tab" data-tab="creators">Creators</a></li>
+                <li><a href="#lifestyle" class="nav-tab" data-tab="lifestyle">Lifestyle</a></li>
+                <li><a href="#money" class="nav-tab" data-tab="money">Money</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="welcome-banner" id="welcome-banner">
+        <p class="welcome-text">
+            Welcome 👋 Since you're new, you can unlock <span class="special-text">special abilities</span> by contributing to discussions.
+        </p>
+        <button class="close-banner" id="close-banner">&times;</button>
+    </div>
+
+    <main class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="tab-content" id="starting-up-sidebar">
+                <article class="sidebar-post" data-post="startup-1">
+                    <h3 class="sidebar-title">How I Validated My SaaS Idea in 48 Hours</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="12">12</span>
+                        <span class="comment-count" data-comments="8">8</span>
+                        <span class="username">@StartupGuru</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="startup-2">
+                    <h3 class="sidebar-title">From Zero to First Customer: My 30-Day Journey</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="8">8</span>
+                        <span class="comment-count" data-comments="5">5</span>
+                        <span class="username">@BuilderLife</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="tech-sidebar" style="display: none;">
+                <article class="sidebar-post" data-post="tech-1">
+                    <h3 class="sidebar-title">Building a React App with 99.9% Uptime</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="15">15</span>
+                        <span class="comment-count" data-comments="12">12</span>
+                        <span class="username">@TechWiz</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="tech-2">
+                    <h3 class="sidebar-title">Why I Switched from AWS to Railway</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="9">9</span>
+                        <span class="comment-count" data-comments="14">14</span>
+                        <span class="username">@DevOpsJoe</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="ai-sidebar" style="display: none;">
+                <article class="sidebar-post" data-post="ai-1">
+                    <h3 class="sidebar-title">How AI Tripled My Productivity as a Solo Developer</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="25">25</span>
+                        <span class="comment-count" data-comments="18">18</span>
+                        <span class="username">@AIBuilder</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="ai-2">
+                    <h3 class="sidebar-title">Building an AI Chatbot for $50/month</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="11">11</span>
+                        <span class="comment-count" data-comments="6">6</span>
+                        <span class="username">@ChatBotMaker</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="builder-hub-sidebar">
+                <article class="sidebar-post" data-post="ih-1">
+                    <h3 class="sidebar-title">Accio: How a Simple Calculator Took Our Buyer Growth to 100K</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="4">4</span>
+                        <span class="comment-count" data-comments="4">4</span>
+                        <span class="username">@Accio</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="ih-2">
+                    <h3 class="sidebar-title">CenterPage: I built a disappointment-as-a-service app</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="6">6</span>
+                        <span class="comment-count" data-comments="4">4</span>
+                        <span class="username">@Dondakirne</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="ih-3">
+                    <h3 class="sidebar-title">I built Offgrid Diary in one chaotic weekend</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="5">5</span>
+                        <span class="comment-count" data-comments="0">0</span>
+                        <span class="username">@MaxBasev</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="ih-4">
+                    <h3 class="sidebar-title">From Side Project to App Store: AI Journaling App</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="5">5</span>
+                        <span class="comment-count" data-comments="2">2</span>
+                        <span class="username">@wilan</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="creators-sidebar" style="display: none;">
+                <article class="sidebar-post" data-post="creator-1">
+                    <h3 class="sidebar-title">How I Grew My YouTube Channel to 100K Subscribers</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="20">20</span>
+                        <span class="comment-count" data-comments="15">15</span>
+                        <span class="username">@YouTuber</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="creator-2">
+                    <h3 class="sidebar-title">Newsletter Empire: From 0 to 10K Subscribers</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="13">13</span>
+                        <span class="comment-count" data-comments="9">9</span>
+                        <span class="username">@NewsletterPro</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="lifestyle-sidebar" style="display: none;">
+                <article class="sidebar-post" data-post="lifestyle-1">
+                    <h3 class="sidebar-title">Digital Nomad: Working from 12 Countries</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="18">18</span>
+                        <span class="comment-count" data-comments="22">22</span>
+                        <span class="username">@NomadLife</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="lifestyle-2">
+                    <h3 class="sidebar-title">Work-Life Balance as a Solo Founder</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="7">7</span>
+                        <span class="comment-count" data-comments="11">11</span>
+                        <span class="username">@BalancedBuilder</span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="tab-content" id="money-sidebar" style="display: none;">
+                <article class="sidebar-post" data-post="money-1">
+                    <h3 class="sidebar-title">How I Hit $10K MRR in 6 Months</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="30">30</span>
+                        <span class="comment-count" data-comments="25">25</span>
+                        <span class="username">@RevenueKing</span>
+                    </div>
+                </article>
+                <article class="sidebar-post" data-post="money-2">
+                    <h3 class="sidebar-title">Pricing Strategy That 3x'd My Revenue</h3>
+                    <div class="sidebar-meta">
+                        <span class="vote-count" data-votes="22">22</span>
+                        <span class="comment-count" data-comments="16">16</span>
+                        <span class="username">@PricingPro</span>
+                    </div>
+                </article>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="main-content">
+            <div class="action-buttons">
+                <button class="action-btn" id="submit-btn">
+                    SUBMIT a post to Builder Hub ✏️
+                </button>
+                <button class="action-btn secondary" id="advertise-btn">
+                    ADVERTISE on Builder Hub 📢
+                </button>
+            </div>
+
+            <article class="featured-post" id="featured-post">
+                <div class="featured-image" id="featured-image">
+                    Hitting a 7-figure ARR by adding value in niche communities
+                </div>
+                <div class="post-content">
+                    <h1 class="post-title" id="post-title">Hitting a 7-figure ARR by adding value in niche communities</h1>
+                    <p class="post-description" id="post-description">
+                        Mas Hossain built a tool for his agency, then started talking about it in communities. Now, it's bringing in a 7-figure ARR.
+                    </p>
+                    <div class="post-meta">
+                        <button class="meta-item vote-btn" id="upvote-btn">
+                            👍 <span id="upvote-count">10</span> upvotes
+                        </button>
+                        <button class="meta-item comment-btn" id="comment-btn">
+                            💬 <span id="comment-count">6</span> comments
+                        </button>
+                        <span class="meta-item">
+                            <span class="username">@BuilderJames</span>
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Comments Section -->
+            <section class="comments-section" id="comments-section">
+                <h3>Comments</h3>
+                <div class="comment-form">
+                    <textarea id="comment-input" placeholder="Share your thoughts..."></textarea>
+                    <button class="action-btn" id="post-comment">Post Comment</button>
+                </div>
+                <div class="comments-list" id="comments-list">
+                    <!-- Comments will be dynamically added here -->
+                </div>
+            </section>
+        </section>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <div class="sidebar-section">
+                <h3>The Build Board</h3>
+                <p class="section-subtitle">A daily leaderboard of build-in-public posts.</p>
+                
+                <div class="board-item" data-votes="2">
+                    <span class="board-number">#1</span>
+                    <div class="board-avatar"></div>
+                    <div class="board-content">
+                        <div class="board-title">Website online now!!</div>
+                        <div class="board-subtitle">Amodeling</div>
+                    </div>
+                    <button class="board-votes vote-board-btn">2</button>
+                </div>
+
+                <div class="board-item" data-votes="2">
+                    <span class="board-number">#2</span>
+                    <div class="board-avatar"></div>
+                    <div class="board-content">
+                        <div class="board-title">From Freelancer Frustration to Launching My First SaaS</div>
+                        <div class="board-subtitle">Client Hunter AI</div>
+                    </div>
+                    <button class="board-votes vote-board-btn">2</button>
+                </div>
+
+                <div class="board-item" data-votes="2">
+                    <span class="board-number">#3</span>
+                    <div class="board-avatar"></div>
+                    <div class="board-content">
+                        <div class="board-title">Just launched: Productive - a customizable productivity dashboard</div>
+                        <div class="board-subtitle">Productive</div>
+                    </div>
+                    <button class="board-votes vote-board-btn">2</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>The Indie Mini</h3>
+                <p class="section-subtitle">How fast can you solve today's puzzle?</p>
+                
+                <div class="crossword-container">
+                    <div class="crossword-grid" id="crossword-grid">
+                        <!-- Crossword cells will be generated by JavaScript -->
+                    </div>
+                    
+                    <div class="crossword-clues">
+                        <div class="crossword-clue">
+                            <strong>Across</strong><br>
+                            1. Where startup teams send memes instead of working<br>
+                            6. Kind of SaaS that keeps things minimal but effective
+                        </div>
+                        <button class="action-btn crossword-reset" id="crossword-reset">Reset Puzzle</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Newest</h3>
+                <p class="newest-section">
+                    A selection from <a href="#" class="newest-link">the list</a> of recent submissions.
+                </p>
+                <div class="newest-posts" id="newest-posts">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Modal for Submit Post -->
+    <div class="modal" id="submit-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Submit a Post</h2>
+            <form id="submit-form">
+                <input type="text" placeholder="Post Title" id="post-title-input" required>
+                <textarea placeholder="Tell your story..." id="post-content-input" required></textarea>
+                <select id="post-category">
+                    <option value="builder-hub">Builder Hub</option>
+                    <option value="starting-up">Starting Up</option>
+                    <option value="tech">Tech</option>
+                    <option value="ai">A.I.</option>
+                    <option value="creators">Creators</option>
+                    <option value="lifestyle">Lifestyle</option>
+                    <option value="money">Money</option>
+                </select>
+                <button type="submit" class="action-btn">Submit Post</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Advertising -->
+    <div class="modal" id="advertise-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Advertise on Builder Hub</h2>
+            <p>Reach thousands of entrepreneurs and makers with your message.</p>
+            <div class="ad-options">
+                <div class="ad-option">
+                    <h4>Sponsored Post</h4>
+                    <p>Feature your content prominently</p>
+                    <span class="price">$299/week</span>
+                </div>
+                <div class="ad-option">
+                    <h4>Newsletter Sponsor</h4>
+                    <p>Reach our email subscribers</p>
+                    <span class="price">$499/week</span>
+                </div>
+                <div class="ad-option">
+                    <h4>Banner Ad</h4>
+                    <p>Display ad on all pages</p>
+                    <span class="price">$799/week</span>
+                </div>
+            </div>
+            <button class="action-btn" id="contact-sales">Contact Sales</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
