@@ -113,8 +113,7 @@ function initializeApp() {
 // Tab Navigation System
 function setupTabNavigation() {
     const navTabs = document.querySelectorAll('.nav-tab');
-    const tabContents = document.querySelectorAll('.tab-content');
-
+    
     navTabs.forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
@@ -188,12 +187,14 @@ function setupWelcomeBanner() {
     const closeBanner = document.getElementById('close-banner');
     const banner = document.getElementById('welcome-banner');
 
-    closeBanner.addEventListener('click', function() {
-        banner.classList.add('hidden');
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 300);
-    });
+    if (closeBanner && banner) {
+        closeBanner.addEventListener('click', function() {
+            banner.classList.add('hidden');
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 300);
+        });
+    }
 }
 
 // Action Buttons
@@ -201,21 +202,25 @@ function setupActionButtons() {
     const submitBtn = document.getElementById('submit-btn');
     const advertiseBtn = document.getElementById('advertise-btn');
 
-    submitBtn.addEventListener('click', function() {
-        showModal('submit-modal');
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = 'scale(1)';
-        }, 150);
-    });
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function() {
+            showModal('submit-modal');
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    }
 
-    advertiseBtn.addEventListener('click', function() {
-        showModal('advertise-modal');
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = 'scale(1)';
-        }, 150);
-    });
+    if (advertiseBtn) {
+        advertiseBtn.addEventListener('click', function() {
+            showModal('advertise-modal');
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    }
 }
 
 // Modal System
@@ -225,7 +230,9 @@ function setupModals() {
     modals.forEach(modal => {
         // Close button
         const closeBtn = modal.querySelector('.close-modal');
-        closeBtn.addEventListener('click', () => hideModal(modal.id));
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => hideModal(modal.id));
+        }
         
         // Click outside to close
         modal.addEventListener('click', function(e) {
@@ -237,36 +244,51 @@ function setupModals() {
 
     // Submit form handler
     const submitForm = document.getElementById('submit-form');
-    submitForm.addEventListener('submit', handleSubmitPost);
+    if (submitForm) {
+        submitForm.addEventListener('submit', handleSubmitPost);
+    }
 
     // Contact sales button
     const contactSales = document.getElementById('contact-sales');
-    contactSales.addEventListener('click', function() {
-        alert('Thanks for your interest! We\'ll contact you within 24 hours.');
-        hideModal('advertise-modal');
-    });
+    if (contactSales) {
+        contactSales.addEventListener('click', function() {
+            alert('Thanks for your interest! We\'ll contact you within 24 hours.');
+            hideModal('advertise-modal');
+        });
+    }
 }
 
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    
-    // Focus first input
-    const firstInput = modal.querySelector('input, textarea');
-    if (firstInput) {
-        setTimeout(() => firstInput.focus(), 100);
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // Focus first input
+        const firstInput = modal.querySelector('input, textarea');
+        if (firstInput) {
+            setTimeout(() => firstInput.focus(), 100);
+        }
     }
 }
 
 function hideModal(modalId) {
     const modal = document.getElementById(modalId);
-    modal.classList.remove('show');
-    document.body.style.overflow = 'auto';
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    }
 }
 
 function handleSubmitPost(e) {
     e.preventDefault();
+    
+    if (!AppState.isLoggedIn) {
+        showNotification('Please sign in to submit a post', 'error');
+        hideModal('submit-modal');
+        showModal('login-modal');
+        return;
+    }
     
     const title = document.getElementById('post-title-input').value;
     const content = document.getElementById('post-content-input').value;
@@ -281,8 +303,13 @@ function handleSubmitPost(e) {
             timestamp: new Date(),
             votes: 0,
             comments: 0,
-            author: '@You'
+            author: AppState.isLoggedIn ? '@' + AppState.user.name : '@You'
         });
+        
+        // Update user stats if logged in
+        if (AppState.isLoggedIn) {
+            updateUserStats('post');
+        }
         
         // Show success feedback
         showNotification('Post submitted successfully! 🎉');
@@ -301,59 +328,57 @@ function setupVoting() {
     const upvoteBtn = document.getElementById('upvote-btn');
     const commentBtn = document.getElementById('comment-btn');
 
-    upvoteBtn.addEventListener('click', function() {
-        if (!AppState.isLoggedIn) {
-            showNotification('Please sign in to vote', 'error');
-            showModal('login-modal');
-            return;
-        }
-        
-        const currentCount = parseInt(document.getElementById('upvote-count').textContent);
-        const postKey = `${AppState.currentTab}-main`;
-        
-        if (AppState.userVotes.has(postKey)) {
-            // Remove vote
-            AppState.userVotes.delete(postKey);
-            document.getElementById('upvote-count').textContent = currentCount - 1;
-            this.classList.remove('voted');
-            this.style.transform = 'scale(0.9)';
-        } else {
-            // Add vote
-            AppState.userVotes.add(postKey);
-            document.getElementById('upvote-count').textContent = currentCount + 1;
-            this.classList.add('voted');
-            this.style.transform = 'scale(1.1)';
+    if (upvoteBtn) {
+        upvoteBtn.addEventListener('click', function() {
+            const currentCount = parseInt(document.getElementById('upvote-count').textContent);
+            const postKey = `${AppState.currentTab}-main`;
             
-            // Update user stats
-            updateUserStats('vote');
+            if (AppState.userVotes.has(postKey)) {
+                // Remove vote
+                AppState.userVotes.delete(postKey);
+                document.getElementById('upvote-count').textContent = currentCount - 1;
+                this.classList.remove('voted');
+                this.style.transform = 'scale(0.9)';
+            } else {
+                // Add vote
+                AppState.userVotes.add(postKey);
+                document.getElementById('upvote-count').textContent = currentCount + 1;
+                this.classList.add('voted');
+                this.style.transform = 'scale(1.1)';
+                
+                // Update user stats if logged in
+                if (AppState.isLoggedIn) {
+                    updateUserStats('vote');
+                }
+                
+                // Celebration effect
+                createVoteParticles(this);
+            }
             
-            // Celebration effect
-            createVoteParticles(this);
-        }
-        
-        setTimeout(() => {
-            this.style.transform = 'scale(1)';
-        }, 200);
-    });
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 200);
+        });
+    }
 
-    commentBtn.addEventListener('click', function() {
-        if (!AppState.isLoggedIn) {
-            showNotification('Please sign in to comment', 'error');
-            showModal('login-modal');
-            return;
-        }
-        
-        const commentsSection = document.getElementById('comments-section');
-        commentsSection.scrollIntoView({ behavior: 'smooth' });
-        
-        // Highlight comment form
-        const commentInput = document.getElementById('comment-input');
-        commentInput.focus();
-        commentInput.style.borderColor = '#ff6b6b';
-        setTimeout(() => {
-            commentInput.style.borderColor = '#4a5568';
-        }, 2000);
-    });
+    if (commentBtn) {
+        commentBtn.addEventListener('click', function() {
+            const commentsSection = document.getElementById('comments-section');
+            if (commentsSection) {
+                commentsSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Highlight comment form
+                const commentInput = document.getElementById('comment-input');
+                if (commentInput) {
+                    commentInput.focus();
+                    commentInput.style.borderColor = '#ff6b6b';
+                    setTimeout(() => {
+                        commentInput.style.borderColor = '#4a5568';
+                    }, 2000);
+                }
+            }
+        });
+    }
 }
 
 function createVoteParticles(element) {
@@ -387,64 +412,72 @@ function setupComments() {
     const postCommentBtn = document.getElementById('post-comment');
     const commentInput = document.getElementById('comment-input');
 
-    postCommentBtn.addEventListener('click', function() {
-        const commentText = commentInput.value.trim();
-        if (commentText) {
-            addComment(commentText);
-            commentInput.value = '';
-            
-            // Update comment count
-            const currentCount = parseInt(document.getElementById('comment-count').textContent);
-            document.getElementById('comment-count').textContent = currentCount + 1;
-            
-            // Show feedback
-            this.textContent = 'Posted! ✓';
-            setTimeout(() => {
-                this.textContent = 'Post Comment';
-            }, 2000);
-        }
-    });
+    if (postCommentBtn && commentInput) {
+        postCommentBtn.addEventListener('click', function() {
+            const commentText = commentInput.value.trim();
+            if (commentText) {
+                addComment(commentText);
+                commentInput.value = '';
+                
+                // Update comment count
+                const currentCount = parseInt(document.getElementById('comment-count').textContent);
+                document.getElementById('comment-count').textContent = currentCount + 1;
+                
+                // Show feedback
+                this.textContent = 'Posted! ✓';
+                setTimeout(() => {
+                    this.textContent = 'Post Comment';
+                }, 2000);
+            }
+        });
 
-    // Enter to submit
-    commentInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && e.ctrlKey) {
-            postCommentBtn.click();
-        }
-    });
+        // Enter to submit
+        commentInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                postCommentBtn.click();
+            }
+        });
+    }
 }
 
 function addComment(text) {
     const comment = {
         id: Date.now(),
         text,
-        author: '@You',
+        author: AppState.isLoggedIn ? '@' + AppState.user.name : '@Anonymous',
         timestamp: new Date()
     };
     
     AppState.comments.push(comment);
     renderComment(comment);
+    
+    if (AppState.isLoggedIn) {
+        updateUserStats('comment');
+    }
 }
 
 function renderComment(comment) {
     const commentsList = document.getElementById('comments-list');
-    const commentElement = document.createElement('div');
-    commentElement.className = 'comment';
-    commentElement.innerHTML = `
-        <div class="comment-author">${comment.author}</div>
-        <div class="comment-text">${comment.text}</div>
-        <div class="comment-time">${formatTime(comment.timestamp)}</div>
-    `;
-    
-    // Add with animation
-    commentElement.style.opacity = '0';
-    commentElement.style.transform = 'translateY(20px)';
-    commentsList.appendChild(commentElement);
-    
-    setTimeout(() => {
-        commentElement.style.transition = 'all 0.3s ease';
-        commentElement.style.opacity = '1';
-        commentElement.style.transform = 'translateY(0)';
-    }, 10);
+    if (commentsList) {
+        const commentElement = document.createElement('div');
+        commentElement.className = 'comment';
+        commentElement.innerHTML = `
+            <div class="comment-author">${comment.author}</div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-time">${formatTime(comment.timestamp)}</div>
+        `;
+        
+        // Add with animation
+        commentElement.style.opacity = '0';
+        commentElement.style.transform = 'translateY(20px)';
+        commentsList.appendChild(commentElement);
+        
+        setTimeout(() => {
+            commentElement.style.transition = 'all 0.3s ease';
+            commentElement.style.opacity = '1';
+            commentElement.style.transform = 'translateY(0)';
+        }, 10);
+    }
 }
 
 // Crossword Game
@@ -452,28 +485,32 @@ function setupCrossword() {
     const grid = document.getElementById('crossword-grid');
     const resetBtn = document.getElementById('crossword-reset');
     
-    // Generate grid
-    for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < 5; col++) {
-            const cell = document.createElement('div');
-            cell.className = 'crossword-cell';
-            cell.dataset.row = row;
-            cell.dataset.col = col;
-            
-            // Pre-fill some cells
-            if (CrosswordData.solution[row] && CrosswordData.solution[row][col]) {
-                if ((row === 1 && col >= 1 && col <= 4) || (row === 0 && col === 1)) {
-                    cell.textContent = CrosswordData.solution[row][col];
-                    cell.classList.add('filled');
+    if (grid) {
+        // Generate grid
+        for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 5; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'crossword-cell';
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                
+                // Pre-fill some cells
+                if (CrosswordData.solution[row] && CrosswordData.solution[row][col]) {
+                    if ((row === 1 && col >= 1 && col <= 4) || (row === 0 && col === 1)) {
+                        cell.textContent = CrosswordData.solution[row][col];
+                        cell.classList.add('filled');
+                    }
                 }
+                
+                cell.addEventListener('click', () => selectCrosswordCell(cell));
+                grid.appendChild(cell);
             }
-            
-            cell.addEventListener('click', () => selectCrosswordCell(cell));
-            grid.appendChild(cell);
         }
     }
     
-    resetBtn.addEventListener('click', resetCrossword);
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetCrossword);
+    }
     
     // Keyboard input
     document.addEventListener('keydown', handleCrosswordInput);
@@ -575,7 +612,6 @@ function setupBoardVoting() {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
             
-            const boardItem = this.closest('.board-item');
             const itemKey = `board-${index}`;
             const currentVotes = parseInt(this.textContent);
             
@@ -616,17 +652,19 @@ function updateBoardRankings() {
     // Update rankings
     boardItems.forEach((item, index) => {
         const numberElement = item.querySelector('.board-number');
-        numberElement.textContent = `#${index + 1}`;
-        
-        // Highlight changes
-        if (numberElement.textContent !== numberElement.dataset.oldNumber) {
-            item.style.background = 'rgba(255, 107, 107, 0.1)';
-            setTimeout(() => {
-                item.style.background = 'transparent';
-            }, 1000);
+        if (numberElement) {
+            numberElement.textContent = `#${index + 1}`;
+            
+            // Highlight changes
+            if (numberElement.textContent !== numberElement.dataset.oldNumber) {
+                item.style.background = 'rgba(255, 107, 107, 0.1)';
+                setTimeout(() => {
+                    item.style.background = 'transparent';
+                }, 1000);
+            }
+            
+            numberElement.dataset.oldNumber = numberElement.textContent;
         }
-        
-        numberElement.dataset.oldNumber = numberElement.textContent;
     });
 }
 
@@ -656,21 +694,23 @@ function setupSidebarInteractions() {
         const voteCount = post.querySelector('.vote-count');
         const commentCount = post.querySelector('.comment-count');
         
-        voteCount.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const current = parseInt(this.textContent);
-            const postKey = post.dataset.post;
-            
-            if (AppState.userVotes.has(postKey)) {
-                AppState.userVotes.delete(postKey);
-                this.textContent = current - 1;
-                this.style.color = '#718096';
-            } else {
-                AppState.userVotes.add(postKey);
-                this.textContent = current + 1;
-                this.style.color = '#ff6b6b';
-            }
-        });
+        if (voteCount) {
+            voteCount.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const current = parseInt(this.textContent);
+                const postKey = post.dataset.post;
+                
+                if (AppState.userVotes.has(postKey)) {
+                    AppState.userVotes.delete(postKey);
+                    this.textContent = current - 1;
+                    this.style.color = '#718096';
+                } else {
+                    AppState.userVotes.add(postKey);
+                    this.textContent = current + 1;
+                    this.style.color = '#ff6b6b';
+                }
+            });
+        }
     });
 }
 
@@ -697,6 +737,8 @@ function updateMainContentFromSidebar(postElement) {
 // Newest Posts
 function loadNewestPosts() {
     const newestContainer = document.getElementById('newest-posts');
+    if (!newestContainer) return;
+    
     const samplePosts = [
         'How I automated my entire sales funnel',
         'Building a Chrome extension in 48 hours',
@@ -729,10 +771,12 @@ function setupScrollEffects() {
         const header = document.querySelector('.header');
         
         // Header shadow on scroll
-        if (scrolled > 10) {
-            header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
-        } else {
-            header.style.boxShadow = 'none';
+        if (header) {
+            if (scrolled > 10) {
+                header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+            } else {
+                header.style.boxShadow = 'none';
+            }
         }
         
         // Parallax effect on featured image
@@ -767,51 +811,68 @@ function setupAuthentication() {
     const profileLink = document.getElementById('profile-link');
     
     // Show login/signup modals
-    signInBtn?.addEventListener('click', () => showModal('login-modal'));
-    joinBtn?.addEventListener('click', () => showModal('signup-modal'));
+    if (signInBtn) signInBtn.addEventListener('click', () => showModal('login-modal'));
+    if (joinBtn) joinBtn.addEventListener('click', () => showModal('signup-modal'));
     
     // Switch between login and signup
-    document.getElementById('show-signup')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        hideModal('login-modal');
-        showModal('signup-modal');
-    });
+    const showSignup = document.getElementById('show-signup');
+    const showLogin = document.getElementById('show-login');
     
-    document.getElementById('show-login')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        hideModal('signup-modal');
-        showModal('login-modal');
-    });
+    if (showSignup) {
+        showSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal('login-modal');
+            showModal('signup-modal');
+        });
+    }
+    
+    if (showLogin) {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal('signup-modal');
+            showModal('login-modal');
+        });
+    }
     
     // User menu dropdown
-    userAvatar?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const dropdown = document.getElementById('dropdown-menu');
-        dropdown.classList.toggle('show');
-    });
+    if (userAvatar) {
+        userAvatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('dropdown-menu');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        });
+    }
     
     // Close dropdown when clicking outside
     document.addEventListener('click', () => {
         const dropdown = document.getElementById('dropdown-menu');
-        dropdown?.classList.remove('show');
+        if (dropdown) {
+            dropdown.classList.remove('show');
+        }
     });
     
     // Profile modal
-    profileLink?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showModal('profile-modal');
-        loadUserProfile();
-    });
+    if (profileLink) {
+        profileLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal('profile-modal');
+            loadUserProfile();
+        });
+    }
     
     // Form submissions
-    loginForm?.addEventListener('submit', handleLogin);
-    signupForm?.addEventListener('submit', handleSignup);
-    profileForm?.addEventListener('submit', handleProfileUpdate);
-    logoutBtn?.addEventListener('click', handleLogout);
+    if (loginForm) loginForm.addEventListener('submit', handleLogin);
+    if (signupForm) signupForm.addEventListener('submit', handleSignup);
+    if (profileForm) profileForm.addEventListener('submit', handleProfileUpdate);
+    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
     
     // Google auth buttons (demo)
-    document.getElementById('google-login')?.addEventListener('click', handleGoogleAuth);
-    document.getElementById('google-signup')?.addEventListener('click', handleGoogleAuth);
+    const googleLogin = document.getElementById('google-login');
+    const googleSignup = document.getElementById('google-signup');
+    if (googleLogin) googleLogin.addEventListener('click', handleGoogleAuth);
+    if (googleSignup) googleSignup.addEventListener('click', handleGoogleAuth);
 }
 
 function handleLogin(e) {
@@ -946,10 +1007,17 @@ function handleProfileUpdate(e) {
     };
     
     // Save to localStorage
-    localStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    try {
+        localStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    } catch (e) {
+        console.log('localStorage not available');
+    }
     
     // Update UI
-    document.getElementById('user-name').textContent = name;
+    const userNameElement = document.getElementById('user-name');
+    if (userNameElement) {
+        userNameElement.textContent = name;
+    }
     
     hideModal('profile-modal');
     showNotification('Profile updated successfully! ✅');
@@ -960,8 +1028,12 @@ function handleLogout() {
     AppState.isLoggedIn = false;
     
     // Clear localStorage
-    localStorage.removeItem('builderHub_user');
-    localStorage.removeItem('builderHub_rememberMe');
+    try {
+        localStorage.removeItem('builderHub_user');
+        localStorage.removeItem('builderHub_rememberMe');
+    } catch (e) {
+        console.log('localStorage not available');
+    }
     
     // Update UI
     updateAuthUI();
@@ -974,11 +1046,13 @@ function loginUser(user, rememberMe) {
     AppState.isLoggedIn = true;
     
     // Save to localStorage
-    if (rememberMe) {
-        localStorage.setItem('builderHub_user', JSON.stringify(user));
-        localStorage.setItem('builderHub_rememberMe', 'true');
-    } else {
-        sessionStorage.setItem('builderHub_user', JSON.stringify(user));
+    try {
+        if (rememberMe) {
+            localStorage.setItem('builderHub_user', JSON.stringify(user));
+            localStorage.setItem('builderHub_rememberMe', 'true');
+        }
+    } catch (e) {
+        console.log('localStorage not available');
     }
     
     // Update UI
@@ -986,24 +1060,19 @@ function loginUser(user, rememberMe) {
 }
 
 function checkAuthState() {
-    // Check localStorage first (remember me)
-    const savedUser = localStorage.getItem('builderHub_user');
-    const rememberMe = localStorage.getItem('builderHub_rememberMe');
-    
-    if (savedUser && rememberMe) {
-        AppState.user = JSON.parse(savedUser);
-        AppState.isLoggedIn = true;
-        updateAuthUI();
-        return;
-    }
-    
-    // Check sessionStorage (current session)
-    const sessionUser = sessionStorage.getItem('builderHub_user');
-    if (sessionUser) {
-        AppState.user = JSON.parse(sessionUser);
-        AppState.isLoggedIn = true;
-        updateAuthUI();
-        return;
+    try {
+        // Check localStorage first (remember me)
+        const savedUser = localStorage.getItem('builderHub_user');
+        const rememberMe = localStorage.getItem('builderHub_rememberMe');
+        
+        if (savedUser && rememberMe) {
+            AppState.user = JSON.parse(savedUser);
+            AppState.isLoggedIn = true;
+            updateAuthUI();
+            return;
+        }
+    } catch (e) {
+        console.log('localStorage not available');
     }
     
     // No saved user, show login buttons
@@ -1018,11 +1087,11 @@ function updateAuthUI() {
     
     if (AppState.isLoggedIn && AppState.user) {
         // Hide auth buttons, show user menu
-        authButtons.style.display = 'none';
-        userMenu.style.display = 'block';
+        if (authButtons) authButtons.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'block';
         
         // Update user info
-        userNameElement.textContent = AppState.user.name;
+        if (userNameElement) userNameElement.textContent = AppState.user.name;
         if (userAvatarImg) {
             userAvatarImg.src = AppState.user.avatar;
             userAvatarImg.alt = AppState.user.name;
@@ -1033,8 +1102,8 @@ function updateAuthUI() {
         
     } else {
         // Show auth buttons, hide user menu
-        authButtons.style.display = 'flex';
-        userMenu.style.display = 'none';
+        if (authButtons) authButtons.style.display = 'flex';
+        if (userMenu) userMenu.style.display = 'none';
     }
 }
 
@@ -1053,19 +1122,30 @@ function loadUserProfile() {
     const user = AppState.user;
     
     // Populate form fields
-    document.getElementById('profile-name').value = user.name || '';
-    document.getElementById('profile-email').value = user.email || '';
-    document.getElementById('profile-bio').value = user.bio || '';
-    document.getElementById('profile-website').value = user.website || '';
-    document.getElementById('profile-location').value = user.location || '';
+    const profileName = document.getElementById('profile-name');
+    const profileEmail = document.getElementById('profile-email');
+    const profileBio = document.getElementById('profile-bio');
+    const profileWebsite = document.getElementById('profile-website');
+    const profileLocation = document.getElementById('profile-location');
+    
+    if (profileName) profileName.value = user.name || '';
+    if (profileEmail) profileEmail.value = user.email || '';
+    if (profileBio) profileBio.value = user.bio || '';
+    if (profileWebsite) profileWebsite.value = user.website || '';
+    if (profileLocation) profileLocation.value = user.location || '';
     
     // Update profile image
-    document.getElementById('profile-img').src = user.avatar;
+    const profileImg = document.getElementById('profile-img');
+    if (profileImg) profileImg.src = user.avatar;
     
     // Update stats
-    document.getElementById('user-posts').textContent = user.posts || 0;
-    document.getElementById('user-votes').textContent = user.votes || 0;
-    document.getElementById('user-comments').textContent = user.comments || 0;
+    const userPosts = document.getElementById('user-posts');
+    const userVotes = document.getElementById('user-votes');
+    const userComments = document.getElementById('user-comments');
+    
+    if (userPosts) userPosts.textContent = user.posts || 0;
+    if (userVotes) userVotes.textContent = user.votes || 0;
+    if (userComments) userComments.textContent = user.comments || 0;
 }
 
 function generateUserId() {
@@ -1088,83 +1168,11 @@ function updateUserStats(type) {
     }
     
     // Save updated user data
-    if (localStorage.getItem('builderHub_user')) {
+    try {
         localStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
-    } else {
-        sessionStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    } catch (e) {
+        console.log('localStorage not available');
     }
-}
-
-// Update existing functions to work with authentication
-function addComment(text) {
-    if (!AppState.isLoggedIn) {
-        showNotification('Please sign in to comment', 'error');
-        showModal('login-modal');
-        return;
-    }
-    
-    const comment = {
-        id: Date.now(),
-        text,
-        author: '@' + AppState.user.name,
-        timestamp: new Date()
-    };
-    
-    AppState.comments.push(comment);
-    renderComment(comment);
-    updateUserStats('comment');
-}
-
-function handleSubmitPost(e) {
-    e.preventDefault();
-    
-    if (!AppState.isLoggedIn) {
-        showNotification('Please sign in to submit a post', 'error');
-        hideModal('submit-modal');
-        showModal('login-modal');
-        return;
-    }
-    
-    const title = document.getElementById('post-title-input').value;
-    const content = document.getElementById('post-content-input').value;
-    const category = document.getElementById('post-category').value;
-    
-    if (title && content) {
-        // Add to submissions
-        AppState.newSubmissions.push({
-            title,
-            content,
-            category,
-            timestamp: new Date(),
-            votes: 0,
-            comments: 0,
-            author: '@' + AppState.user.name
-        });
-        
-        // Update user stats
-        updateUserStats('post');
-        
-        // Show success feedback
-        showNotification('Post submitted successfully! 🎉');
-        
-        // Reset form and close modal
-        e.target.reset();
-        hideModal('submit-modal');
-        
-        // Update newest posts
-        loadNewestPosts();
-    }
-}
-    const now = new Date();
-    const diff = now - date;
-    const minutes = Math.floor(diff / 60000);
-    
-    if (minutes < 1) return 'just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
 }
 
 // Utility Functions
@@ -1246,5 +1254,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Export for debugging (optional)
-window.AppState = AppState;
-window.switchTab = switchTab;
+if (typeof window !== 'undefined') {
+    window.AppState = AppState;
+    window.switchTab = switchTab;
+}
