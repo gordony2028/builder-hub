@@ -5,7 +5,9 @@ const AppState = {
     userBoardVotes: new Set(),
     comments: [],
     crosswordProgress: {},
-    newSubmissions: []
+    newSubmissions: [],
+    user: null,
+    isLoggedIn: false
 };
 
 // Sample data for different tabs
@@ -104,6 +106,8 @@ function initializeApp() {
     setupSidebarInteractions();
     loadNewestPosts();
     setupScrollEffects();
+    setupAuthentication();
+    checkAuthState();
 }
 
 // Tab Navigation System
@@ -298,6 +302,12 @@ function setupVoting() {
     const commentBtn = document.getElementById('comment-btn');
 
     upvoteBtn.addEventListener('click', function() {
+        if (!AppState.isLoggedIn) {
+            showNotification('Please sign in to vote', 'error');
+            showModal('login-modal');
+            return;
+        }
+        
         const currentCount = parseInt(document.getElementById('upvote-count').textContent);
         const postKey = `${AppState.currentTab}-main`;
         
@@ -314,6 +324,9 @@ function setupVoting() {
             this.classList.add('voted');
             this.style.transform = 'scale(1.1)';
             
+            // Update user stats
+            updateUserStats('vote');
+            
             // Celebration effect
             createVoteParticles(this);
         }
@@ -324,6 +337,12 @@ function setupVoting() {
     });
 
     commentBtn.addEventListener('click', function() {
+        if (!AppState.isLoggedIn) {
+            showNotification('Please sign in to comment', 'error');
+            showModal('login-modal');
+            return;
+        }
+        
         const commentsSection = document.getElementById('comments-section');
         commentsSection.scrollIntoView({ behavior: 'smooth' });
         
@@ -736,6 +755,418 @@ function setupScrollEffects() {
     window.addEventListener('scroll', requestTick);
 }
 
+// Authentication System
+function setupAuthentication() {
+    const signInBtn = document.getElementById('sign-in-btn');
+    const joinBtn = document.getElementById('join-btn');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const profileForm = document.getElementById('profile-form');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userAvatar = document.getElementById('user-avatar');
+    const profileLink = document.getElementById('profile-link');
+    
+    // Show login/signup modals
+    signInBtn?.addEventListener('click', () => showModal('login-modal'));
+    joinBtn?.addEventListener('click', () => showModal('signup-modal'));
+    
+    // Switch between login and signup
+    document.getElementById('show-signup')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideModal('login-modal');
+        showModal('signup-modal');
+    });
+    
+    document.getElementById('show-login')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideModal('signup-modal');
+        showModal('login-modal');
+    });
+    
+    // User menu dropdown
+    userAvatar?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById('dropdown-menu');
+        dropdown.classList.toggle('show');
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        const dropdown = document.getElementById('dropdown-menu');
+        dropdown?.classList.remove('show');
+    });
+    
+    // Profile modal
+    profileLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showModal('profile-modal');
+        loadUserProfile();
+    });
+    
+    // Form submissions
+    loginForm?.addEventListener('submit', handleLogin);
+    signupForm?.addEventListener('submit', handleSignup);
+    profileForm?.addEventListener('submit', handleProfileUpdate);
+    logoutBtn?.addEventListener('click', handleLogout);
+    
+    // Google auth buttons (demo)
+    document.getElementById('google-login')?.addEventListener('click', handleGoogleAuth);
+    document.getElementById('google-signup')?.addEventListener('click', handleGoogleAuth);
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const rememberMe = document.getElementById('remember-me').checked;
+    
+    // Simulate login validation
+    if (email && password) {
+        if (password.length < 6) {
+            showNotification('Password must be at least 6 characters', 'error');
+            return;
+        }
+        
+        // Create user object
+        const user = {
+            id: generateUserId(),
+            email: email,
+            name: email.split('@')[0],
+            avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face`,
+            joinDate: new Date(),
+            posts: 0,
+            votes: 0,
+            comments: 0,
+            bio: '',
+            website: '',
+            location: ''
+        };
+        
+        loginUser(user, rememberMe);
+        hideModal('login-modal');
+        showNotification('Welcome back! 🎉');
+        
+        // Reset form
+        e.target.reset();
+    }
+}
+
+function handleSignup(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm').value;
+    const agreeTerms = document.getElementById('terms-agree').checked;
+    
+    // Validation
+    if (!agreeTerms) {
+        showNotification('Please agree to the terms of service', 'error');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        showNotification('Passwords do not match', 'error');
+        return;
+    }
+    
+    if (password.length < 6) {
+        showNotification('Password must be at least 6 characters', 'error');
+        return;
+    }
+    
+    if (name && email && password) {
+        // Create new user
+        const user = {
+            id: generateUserId(),
+            email: email,
+            name: name,
+            avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face`,
+            joinDate: new Date(),
+            posts: 0,
+            votes: 0,
+            comments: 0,
+            bio: '',
+            website: '',
+            location: ''
+        };
+        
+        loginUser(user, true);
+        hideModal('signup-modal');
+        showNotification('Account created successfully! Welcome to Builder Hub! 🎉');
+        
+        // Reset form
+        e.target.reset();
+    }
+}
+
+function handleGoogleAuth() {
+    // Simulate Google OAuth
+    const user = {
+        id: generateUserId(),
+        email: 'user@gmail.com',
+        name: 'Google User',
+        avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face`,
+        joinDate: new Date(),
+        posts: 0,
+        votes: 0,
+        comments: 0,
+        bio: 'Joined with Google',
+        website: '',
+        location: ''
+    };
+    
+    loginUser(user, true);
+    hideModal('login-modal');
+    hideModal('signup-modal');
+    showNotification('Signed in with Google! 🎉');
+}
+
+function handleProfileUpdate(e) {
+    e.preventDefault();
+    
+    if (!AppState.isLoggedIn) return;
+    
+    const name = document.getElementById('profile-name').value;
+    const email = document.getElementById('profile-email').value;
+    const bio = document.getElementById('profile-bio').value;
+    const website = document.getElementById('profile-website').value;
+    const location = document.getElementById('profile-location').value;
+    
+    // Update user data
+    AppState.user = {
+        ...AppState.user,
+        name,
+        email,
+        bio,
+        website,
+        location
+    };
+    
+    // Save to localStorage
+    localStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    
+    // Update UI
+    document.getElementById('user-name').textContent = name;
+    
+    hideModal('profile-modal');
+    showNotification('Profile updated successfully! ✅');
+}
+
+function handleLogout() {
+    AppState.user = null;
+    AppState.isLoggedIn = false;
+    
+    // Clear localStorage
+    localStorage.removeItem('builderHub_user');
+    localStorage.removeItem('builderHub_rememberMe');
+    
+    // Update UI
+    updateAuthUI();
+    
+    showNotification('Logged out successfully! 👋');
+}
+
+function loginUser(user, rememberMe) {
+    AppState.user = user;
+    AppState.isLoggedIn = true;
+    
+    // Save to localStorage
+    if (rememberMe) {
+        localStorage.setItem('builderHub_user', JSON.stringify(user));
+        localStorage.setItem('builderHub_rememberMe', 'true');
+    } else {
+        sessionStorage.setItem('builderHub_user', JSON.stringify(user));
+    }
+    
+    // Update UI
+    updateAuthUI();
+}
+
+function checkAuthState() {
+    // Check localStorage first (remember me)
+    const savedUser = localStorage.getItem('builderHub_user');
+    const rememberMe = localStorage.getItem('builderHub_rememberMe');
+    
+    if (savedUser && rememberMe) {
+        AppState.user = JSON.parse(savedUser);
+        AppState.isLoggedIn = true;
+        updateAuthUI();
+        return;
+    }
+    
+    // Check sessionStorage (current session)
+    const sessionUser = sessionStorage.getItem('builderHub_user');
+    if (sessionUser) {
+        AppState.user = JSON.parse(sessionUser);
+        AppState.isLoggedIn = true;
+        updateAuthUI();
+        return;
+    }
+    
+    // No saved user, show login buttons
+    updateAuthUI();
+}
+
+function updateAuthUI() {
+    const authButtons = document.getElementById('auth-buttons');
+    const userMenu = document.getElementById('user-menu');
+    const userNameElement = document.getElementById('user-name');
+    const userAvatarImg = document.querySelector('#user-avatar .avatar-img');
+    
+    if (AppState.isLoggedIn && AppState.user) {
+        // Hide auth buttons, show user menu
+        authButtons.style.display = 'none';
+        userMenu.style.display = 'block';
+        
+        // Update user info
+        userNameElement.textContent = AppState.user.name;
+        if (userAvatarImg) {
+            userAvatarImg.src = AppState.user.avatar;
+            userAvatarImg.alt = AppState.user.name;
+        }
+        
+        // Update welcome banner for logged in users
+        updateWelcomeBannerForUser();
+        
+    } else {
+        // Show auth buttons, hide user menu
+        authButtons.style.display = 'flex';
+        userMenu.style.display = 'none';
+    }
+}
+
+function updateWelcomeBannerForUser() {
+    if (!AppState.isLoggedIn || !AppState.user) return;
+    
+    const welcomeText = document.querySelector('.welcome-text');
+    if (welcomeText) {
+        welcomeText.innerHTML = `Welcome back, <strong>${AppState.user.name}</strong>! 👋 Ready to share your latest project?`;
+    }
+}
+
+function loadUserProfile() {
+    if (!AppState.isLoggedIn || !AppState.user) return;
+    
+    const user = AppState.user;
+    
+    // Populate form fields
+    document.getElementById('profile-name').value = user.name || '';
+    document.getElementById('profile-email').value = user.email || '';
+    document.getElementById('profile-bio').value = user.bio || '';
+    document.getElementById('profile-website').value = user.website || '';
+    document.getElementById('profile-location').value = user.location || '';
+    
+    // Update profile image
+    document.getElementById('profile-img').src = user.avatar;
+    
+    // Update stats
+    document.getElementById('user-posts').textContent = user.posts || 0;
+    document.getElementById('user-votes').textContent = user.votes || 0;
+    document.getElementById('user-comments').textContent = user.comments || 0;
+}
+
+function generateUserId() {
+    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function updateUserStats(type) {
+    if (!AppState.isLoggedIn || !AppState.user) return;
+    
+    switch(type) {
+        case 'post':
+            AppState.user.posts++;
+            break;
+        case 'vote':
+            AppState.user.votes++;
+            break;
+        case 'comment':
+            AppState.user.comments++;
+            break;
+    }
+    
+    // Save updated user data
+    if (localStorage.getItem('builderHub_user')) {
+        localStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    } else {
+        sessionStorage.setItem('builderHub_user', JSON.stringify(AppState.user));
+    }
+}
+
+// Update existing functions to work with authentication
+function addComment(text) {
+    if (!AppState.isLoggedIn) {
+        showNotification('Please sign in to comment', 'error');
+        showModal('login-modal');
+        return;
+    }
+    
+    const comment = {
+        id: Date.now(),
+        text,
+        author: '@' + AppState.user.name,
+        timestamp: new Date()
+    };
+    
+    AppState.comments.push(comment);
+    renderComment(comment);
+    updateUserStats('comment');
+}
+
+function handleSubmitPost(e) {
+    e.preventDefault();
+    
+    if (!AppState.isLoggedIn) {
+        showNotification('Please sign in to submit a post', 'error');
+        hideModal('submit-modal');
+        showModal('login-modal');
+        return;
+    }
+    
+    const title = document.getElementById('post-title-input').value;
+    const content = document.getElementById('post-content-input').value;
+    const category = document.getElementById('post-category').value;
+    
+    if (title && content) {
+        // Add to submissions
+        AppState.newSubmissions.push({
+            title,
+            content,
+            category,
+            timestamp: new Date(),
+            votes: 0,
+            comments: 0,
+            author: '@' + AppState.user.name
+        });
+        
+        // Update user stats
+        updateUserStats('post');
+        
+        // Show success feedback
+        showNotification('Post submitted successfully! 🎉');
+        
+        // Reset form and close modal
+        e.target.reset();
+        hideModal('submit-modal');
+        
+        // Update newest posts
+        loadNewestPosts();
+    }
+}
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+}
+
 // Utility Functions
 function formatTime(date) {
     const now = new Date();
@@ -750,15 +1181,19 @@ function formatTime(date) {
     return `${days}d ago`;
 }
 
-function showNotification(message) {
+function showNotification(message, type = 'success') {
     // Create notification element
     const notification = document.createElement('div');
     notification.textContent = message;
+    
+    const bgColor = type === 'error' ? '#e53e3e' : '#ff6b6b';
+    const icon = type === 'error' ? '❌' : '✅';
+    
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #ff6b6b;
+        background: ${bgColor};
         color: white;
         padding: 12px 20px;
         border-radius: 6px;
@@ -766,7 +1201,12 @@ function showNotification(message) {
         font-weight: 600;
         transform: translateX(100%);
         transition: transform 0.3s ease;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     `;
+    
+    // Add icon
+    notification.textContent = `${icon} ${message}`;
     
     document.body.appendChild(notification);
     
@@ -783,7 +1223,7 @@ function showNotification(message) {
                 notification.parentNode.removeChild(notification);
             }
         }, 300);
-    }, 3000);
+    }, type === 'error' ? 4000 : 3000);
 }
 
 // Keyboard shortcuts
