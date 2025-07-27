@@ -186,6 +186,8 @@ function setupEventListeners() {
 
 // Tab Management
 function switchTab(tabName) {
+    console.log('Switching to tab:', tabName); // Debug log
+    
     // Update active tab
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.remove('active');
@@ -194,12 +196,18 @@ function switchTab(tabName) {
         }
     });
 
-    // Show appropriate panel
+    // Hide all panels first
     document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.remove('active');
+        panel.style.display = 'none';
     });
     
-    document.getElementById(`${tabName}-panel`).classList.add('active');
+    // Show the selected panel
+    const targetPanel = document.getElementById(`${tabName}-panel`);
+    if (targetPanel) {
+        targetPanel.style.display = 'block';
+        targetPanel.classList.add('active');
+    }
     
     // Load content for the tab
     loadTabContent(tabName);
